@@ -1,4 +1,4 @@
-# No Cap
+# GOTCHA
 
 > **Semantic Trust Verification for AI Tools, MCP Servers, and Agent Skills**
 
@@ -16,13 +16,13 @@ The problem is simple:
 
 A tool can advertise itself as reading project files while silently accessing environment variables, sending network requests, or executing shell commands. Traditional security scanners may detect known vulnerabilities or malware, but they do not determine whether a tool behaves consistently with its documented purpose.
 
-**No Cap** addresses this gap.
+**GOTCHA** addresses this gap.
 
 It is a semantic verification platform that compares an AI tool's documented capabilities with its actual implementation, helping developers, organizations, and autonomous AI agents determine whether a tool deserves to be trusted before it is installed or executed.
 
 ---
 
-## Why No Cap?
+## Why GOTCHA?
 
 Current security solutions answer questions like:
 
@@ -30,11 +30,11 @@ Current security solutions answer questions like:
 * Does this dependency have known vulnerabilities?
 * Does this code contain insecure patterns?
 
-No Cap answers a different question:
+GOTCHA answers a different question:
 
 > **Does this tool actually do only what it claims to do?**
 
-By introducing semantic verification into the AI software supply chain, No Cap enables proactive trust assessment instead of reactive threat detection.
+By introducing semantic verification into the AI software supply chain, GOTCHA enables proactive trust assessment instead of reactive threat detection.
 
 ---
 
@@ -66,7 +66,7 @@ Because these behaviors are not reflected in the documentation, both humans and 
 
 # Our Solution
 
-No Cap introduces a **Description-to-Behavior Verification Pipeline**.
+GOTCHA introduces a **Description-to-Behavior Verification Pipeline**.
 
 Instead of treating documentation as a trusted source, the platform independently verifies whether the implementation aligns with the documented functionality.
 
@@ -190,7 +190,7 @@ Designed for integration into developer workflows through IDE extensions, GitHub
 # Repository Structure
 
 ```text
-No-Cap/
+GOTCHA/
 │
 ├── frontend/
 ├── backend/
@@ -283,4 +283,4 @@ The future of software security is no longer limited to detecting malicious code
 
 As AI agents become responsible for making autonomous decisions, trust must extend beyond authentication and vulnerability scanning.
 
-No Cap aims to make semantic verification a standard part of the AI software supply chain, enabling developers and AI systems to verify not only **how** software is implemented, but also **whether it faithfully represents what it claims to do**.
+GOTCHA aims to make semantic verification a standard part of the AI software supply chain, enabling developers and AI systems to verify not only **how** software is implemented, but also **whether it faithfully represents what it claims to do**.
