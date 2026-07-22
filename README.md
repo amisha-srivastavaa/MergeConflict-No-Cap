@@ -271,14 +271,6 @@ Safe to Install
 
 ---
 
-# Contributing
-
-Contributions are welcome.
-
-If you would like to improve No Cap, report an issue, or suggest a new feature, feel free to open an issue or submit a pull request.
-
----
-
 # License
 
 This project is released under the MIT License.
