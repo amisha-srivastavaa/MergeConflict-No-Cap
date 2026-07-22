@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillScope</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>🛡️ GOTCHA</h1>
+
+    <p class="subtitle">
+        AI Trust Analyzer for MCP Skills
+    </p>
+
+    <label>Description</label>
+
+    <textarea
+        id="description"
+        placeholder="Paste the skill description..."
+    ></textarea>
+
+
+    <label>Python Code</label>
+
+    <textarea
+        id="code"
+        placeholder="Paste Python code..."
+    ></textarea>
+
+    <button onclick="scanSkill()">
+
+        Scan Skill
+
+    </button>
+
+    <div id="loading">
+        Scanning...
+    </div>
+
+    <div id="result">
+
+        <h2>Result</h2>
+
+        <div id="risk"></div>
+
+        <h3>Claims</h3>
+
+        <ul id="claims"></ul>
+
+        <h3>Behavior</h3>
+
+        <ul id="behavior"></ul>
+
+        <h3>Hidden Behaviors</h3>
+
+        <ul id="hidden"></ul>
+
+        <h3>Explanation</h3>
+
+        <p id="explanation"></p>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
