@@ -91,6 +91,14 @@ The tool's natural-language description (README or docs) is sent to an LLM (GPT-
 | `Database` | SQLite, MySQL, PostgreSQL connections |
 | `Shell` | `os.system()` calls |
 | `Subprocess` | `subprocess.run()`, `subprocess.Popen()` |
+| Capability    | What it covers                                  |
+|---------------|-------------------------------------------------|
+| `Filesystem`  | Reading, writing, renaming, deleting files      |
+| `Network`     | HTTP requests, socket connections, URL access   |
+| `Environment` | Accessing env vars, `os.environ`, `os.getenv`   |
+| `Database`    | SQLite, MySQL, PostgreSQL connections           |
+| `Shell`       | `os.system()` calls                             |
+| `Subprocess`  | `subprocess.run()`, `subprocess.Popen()`        |
 
 ### Stage 2 → Behavior Extraction
 
@@ -122,6 +130,11 @@ A risk score (0–100) and status label are assigned based on the number and sev
 | 0 | 10 | `SAFE` | Code matches description — no undisclosed operations |
 | 1 | 55 | `MEDIUM` | One capability not mentioned in description |
 | 2+ | 70–100 | `HIGH` | Multiple undisclosed behaviors — review before use |
+| Hidden Behaviors | Score | Status   | Meaning                                               |
+|------------------|-------|----------|-------------------------------------------------------|
+| 0                | 10    | `SAFE`   | Code matches description. No undisclosed operations.  |
+| 1                | 55    | `MEDIUM` | One capability not mentioned in description.          |
+| 2+               | 70–100| `HIGH`   | Multiple undisclosed behaviors. Review before use.    |
 
 Every scan result is persisted to a SQLite database with timestamps for full audit history.
 
@@ -175,6 +188,41 @@ Every scan result is persisted to a SQLite database with timestamps for full aud
 │  │       via SQLAlchemy ORM                   │                   │
 │  └────────────────────────────────────────────┘                   │
 └───────────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────-──┐
+│                     Frontend (HTML/JS/CSS)               │
+│                                                          │
+│  ┌─────────────┐  ┌──────────────┐  ┌────────────────┐   │
+│  │ Description │  │  Code Input  │  │  Scan Results  │   │
+│  │   Textarea  │  │   Textarea   │  │    Display     │   │
+│  └──────┬──────┘  └──────┬───────┘  └───────▲────────┘   │
+│         │                │                  │            │
+│         └───────┬────────┘                  │            │
+│                 │  POST /scan               │            │
+└─────────────────┼───────────────────────────┼────────────┘
+                  │                           │
+                  ▼                           │
+┌─────────────────────────────────────────────┼────────────┐
+│              FastAPI Backend                │            │
+│                                             │            │
+│  ┌────────────────┐  ┌──────────────────┐   │            │
+│  │ Claim Extractor│  │Behavior Extractor│   │            │
+│  │  (LLM-based)   │  │  (Python AST)    │   │            │
+│  └───────┬────────┘  └───────┬──────────┘   │            │
+│          │                   │              │            │
+│          ▼                   ▼              │            │
+│  ┌───────────────────────────────────┐      │            │
+│  │          Diff Engine              │      │            │
+│  │  (set difference: code - claims)  │      │            │
+│  └───────────────┬───────────────────┘      │            │
+│                  ▼                          │            │
+│  ┌───────────────────────────────────┐      │            │
+│  │         Risk Scorer               │──────┘            │
+│  └───────────────┬───────────────────┘                   │
+│                  ▼                                       │
+│  ┌───────────────────────────────────┐                   │
+│  │     SQLite (scan_results.db)      │                   │
+│  └───────────────────────────────────┘                   │
+└──────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -213,6 +261,15 @@ Every scan result is persisted to a SQLite database with timestamps for full aud
 | **Pydantic v2** | Request/response validation & serialization |
 | **Requests / HTTPX** | HTTP clients for GitHub API integration |
 | **python-dotenv** | Environment variable management |
+| Layer       | Technology                                    |
+|-------------|-----------------------------------------------|
+| Frontend    | HTML, CSS, vanilla JavaScript                 |
+| Backend     | Python 3.9+, FastAPI, Uvicorn                 |
+| LLM         | OpenAI API (GPT-4.1-mini, configurable)       |
+| Analysis    | Python `ast` module (static AST walking)      |
+| Database    | SQLite via SQLAlchemy ORM                     |
+| Validation  | Pydantic v2                                   |
+| HTTP Client | `requests`, `httpx`                           |
 
 ---
 
@@ -498,6 +555,14 @@ Returns aggregated analytics across all scans.
 Returns a specific scan result by ID.
 
 ---
+| Field              | Type       | Description                                     |
+|--------------------|------------|-------------------------------------------------|
+| `risk`             | `int`      | Risk score from 0 (safe) to 100 (high risk)     |
+| `status`           | `string`   | `SAFE`, `MEDIUM`, or `HIGH`                     |
+| `claims`           | `string[]` | Capabilities extracted from the description     |
+| `behavior`         | `string[]` | Capabilities detected in the source code        |
+| `hidden_behaviors` | `string[]` | Behaviors in code but absent from description   |
+| `explanation`      | `string`   | Human-readable summary of the finding           |
 
 ### `GET /health`
 
@@ -532,6 +597,15 @@ The `backend/sample_skills/` directory contains test cases you can use to valida
 | `malicious_env_stealer.py` | Reads config files | Reads env vars + sends them over the network | HIGH |
 | `malicious_hidden_network.py` | Reads config files | Makes undisclosed network requests | MEDIUM/HIGH |
 | `malicious_shell.py` | Reads config files | Executes shell commands via `os.system()` | HIGH |
+| File                          | Description Says            | Code Actually Does                               | Expected Result |
+|-------------------------------|-----------------------------|--------------------------------------------------|-----------------|
+| `safe_reader.py`              | Reads config files          | Reads config files                               | ✅ SAFE         |
+| `safe_weather.py`             | Fetches weather data        | Makes HTTP request for weather                   | ✅ SAFE         |
+| `safe_database.py`            | Accesses database           | Uses database connection                         | ✅ SAFE         |
+| `malicious_exfiltration.py`   | Reads config files          | Reads config + POSTs data to external server     | 🚨 MEDIUM/HIGH  |
+| `malicious_env_stealer.py`    | Reads config files          | Reads env vars + sends them over the network     | 🚨 HIGH         |
+| `malicious_hidden_network.py` | Reads config files          | Makes undisclosed network requests               | 🚨 MEDIUM/HIGH  |
+| `malicious_shell.py`          | Reads config files          | Executes shell commands via `os.system()`        | 🚨 HIGH         |
 
 ---
 
