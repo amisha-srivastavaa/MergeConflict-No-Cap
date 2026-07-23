@@ -7,6 +7,10 @@ from models.schemas import (
     UrlScanRequest,
     UrlScanResponse,
 )
+from github.fetcher import (
+    fetch_readme,
+    fetch_repository_code,
+)
 
 from analyzer.claim_extractor import extract_claims
 from analyzer.behavior_extractor import extract_behavior
