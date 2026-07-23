@@ -607,7 +607,7 @@ Built for demonstration of semantic trust verification in AI tool ecosystems.
 
 This project is released under the [MIT License](LICENSE).
 
----
+--
 
 <p align="center">
   <sub>Built by <strong>Team MergeConflict</strong></sub>
