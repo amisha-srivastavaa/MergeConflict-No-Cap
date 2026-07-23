@@ -384,7 +384,7 @@ The detailed solution architecture is documented in `Solution/GOTCHA_Solution_De
 
 **Team MergeConflict**
 
-Built for hackathon-scale demonstration of semantic trust verification in AI tool ecosystems.
+Built for demonstration of semantic trust verification in AI tool ecosystems.
 
 ---
 
