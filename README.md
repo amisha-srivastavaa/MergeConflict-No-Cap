@@ -63,7 +63,7 @@ GOTCHA runs a four-stage verification pipeline on every scan:
 The tool's natural-language description is sent to an LLM (GPT-4.1-mini by default). The model classifies the description into a set of **claimed capabilities** from a fixed taxonomy:
 
 | Capability    | What it covers                                  |
-|---------------|------------------------------------------------|
+|---------------|-------------------------------------------------|
 | `Filesystem`  | Reading, writing, renaming, deleting files      |
 | `Network`     | HTTP requests, socket connections, URL access   |
 | `Environment` | Accessing env vars, `os.environ`, `os.getenv`   |
@@ -98,8 +98,8 @@ Code actually does:  {Filesystem, Network}
 
 A risk score (0–100) and status label are assigned based on how many hidden behaviors were detected:
 
-| Hidden Behaviors | Score | Status   | Meaning                                              |
-|------------------|-------|----------|------------------------------------------------------|
+| Hidden Behaviors | Score | Status   | Meaning                                               |
+|------------------|-------|----------|-------------------------------------------------------|
 | 0                | 10    | `SAFE`   | Code matches description. No undisclosed operations.  |
 | 1                | 55    | `MEDIUM` | One capability not mentioned in description.          |
 | 2+               | 70–100| `HIGH`   | Multiple undisclosed behaviors. Review before use.    |
@@ -111,13 +111,13 @@ Every scan result is persisted to a SQLite database with timestamps for audit hi
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
+┌───────────────────────────────────────────────────────-──┐
 │                     Frontend (HTML/JS/CSS)               │
-│                                                         │
-│  ┌─────────────┐  ┌──────────────┐  ┌────────────────┐  │
-│  │ Description │  │  Code Input  │  │  Scan Results  │  │
-│  │   Textarea  │  │   Textarea   │  │    Display     │  │
-│  └──────┬──────┘  └──────┬───────┘  └───────▲────────┘  │
+│                                                          │
+│  ┌─────────────┐  ┌──────────────┐  ┌────────────────┐   │
+│  │ Description │  │  Code Input  │  │  Scan Results  │   │
+│  │   Textarea  │  │   Textarea   │  │    Display     │   │
+│  └──────┬──────┘  └──────┬───────┘  └───────▲────────┘   │
 │         │                │                  │            │
 │         └───────┬────────┘                  │            │
 │                 │  POST /scan               │            │
@@ -125,11 +125,11 @@ Every scan result is persisted to a SQLite database with timestamps for audit hi
                   │                           │
                   ▼                           │
 ┌─────────────────────────────────────────────┼────────────┐
-│              FastAPI Backend                 │            │
+│              FastAPI Backend                │            │
 │                                             │            │
 │  ┌────────────────┐  ┌──────────────────┐   │            │
 │  │ Claim Extractor│  │Behavior Extractor│   │            │
-│  │  (LLM-based)  │  │  (Python AST)    │   │            │
+│  │  (LLM-based)   │  │  (Python AST)    │   │            │
 │  └───────┬────────┘  └───────┬──────────┘   │            │
 │          │                   │              │            │
 │          ▼                   ▼              │            │
@@ -152,15 +152,15 @@ Every scan result is persisted to a SQLite database with timestamps for audit hi
 
 ## Tech Stack
 
-| Layer        | Technology                                    |
+| Layer       | Technology                                    |
 |-------------|-----------------------------------------------|
-| Frontend    | HTML, CSS, vanilla JavaScript                  |
-| Backend     | Python 3.9+, FastAPI, Uvicorn                  |
-| LLM         | OpenAI API (GPT-4.1-mini, configurable)        |
-| Analysis    | Python `ast` module (static AST walking)       |
-| Database    | SQLite via SQLAlchemy ORM                      |
-| Validation  | Pydantic v2                                    |
-| HTTP Client | `requests`, `httpx`                            |
+| Frontend    | HTML, CSS, vanilla JavaScript                 |
+| Backend     | Python 3.9+, FastAPI, Uvicorn                 |
+| LLM         | OpenAI API (GPT-4.1-mini, configurable)       |
+| Analysis    | Python `ast` module (static AST walking)      |
+| Database    | SQLite via SQLAlchemy ORM                     |
+| Validation  | Pydantic v2                                   |
+| HTTP Client | `requests`, `httpx`                           |
 
 ---
 
@@ -304,10 +304,10 @@ Analyzes a tool's description and code for behavioral mismatches.
 
 **Response Fields:**
 
-| Field              | Type       | Description                                    |
-|--------------------|------------|------------------------------------------------|
-| `risk`             | `int`      | Risk score from 0 (safe) to 100 (high risk)   |
-| `status`           | `string`   | `SAFE`, `MEDIUM`, or `HIGH`                    |
+| Field              | Type       | Description                                     |
+|--------------------|------------|-------------------------------------------------|
+| `risk`             | `int`      | Risk score from 0 (safe) to 100 (high risk)     |
+| `status`           | `string`   | `SAFE`, `MEDIUM`, or `HIGH`                     |
 | `claims`           | `string[]` | Capabilities extracted from the description     |
 | `behavior`         | `string[]` | Capabilities detected in the source code        |
 | `hidden_behaviors` | `string[]` | Behaviors in code but absent from description   |
@@ -327,11 +327,11 @@ Returns `{"message": "SkillScope Backend Running"}`.
 
 The `backend/sample_skills/` directory contains test cases you can paste into the UI to see GOTCHA in action:
 
-| File                          | Description Says             | Code Actually Does                              | Expected Result |
-|-------------------------------|-----------------------------|-------------------------------------------------|-----------------|
-| `safe_reader.py`              | Reads config files          | Reads config files                               | ✅ SAFE          |
-| `safe_weather.py`             | Fetches weather data        | Makes HTTP request for weather                   | ✅ SAFE          |
-| `safe_database.py`            | Accesses database           | Uses database connection                         | ✅ SAFE          |
+| File                          | Description Says            | Code Actually Does                               | Expected Result |
+|-------------------------------|-----------------------------|--------------------------------------------------|-----------------|
+| `safe_reader.py`              | Reads config files          | Reads config files                               | ✅ SAFE         |
+| `safe_weather.py`             | Fetches weather data        | Makes HTTP request for weather                   | ✅ SAFE         |
+| `safe_database.py`            | Accesses database           | Uses database connection                         | ✅ SAFE         |
 | `malicious_exfiltration.py`   | Reads config files          | Reads config + POSTs data to external server     | 🚨 MEDIUM/HIGH  |
 | `malicious_env_stealer.py`    | Reads config files          | Reads env vars + sends them over the network     | 🚨 HIGH         |
 | `malicious_hidden_network.py` | Reads config files          | Makes undisclosed network requests               | 🚨 MEDIUM/HIGH  |
