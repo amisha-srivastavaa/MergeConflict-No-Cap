@@ -2,7 +2,7 @@
   <img src="https://img.shields.io/badge/GOTCHA-Semantic_Trust_Verification-4f46e5?style=for-the-badge&logo=shield&logoColor=white" alt="GOTCHA" />
 </p>
 
-<h1 align="center">🛡️ GOTCHA</h1>
+<h1 align="center">GOTCHA</h1>
 
 <p align="center">
   <strong>Semantic Trust Verification for AI Tools, MCP Servers & Agent Skills</strong>
@@ -525,13 +525,13 @@ The `backend/sample_skills/` directory contains test cases you can use to valida
 
 | File | Description Says | Code Actually Does | Expected |
 |---|---|---|---|
-| `safe_reader.py` | Reads config files | Reads config files | ✅ SAFE |
-| `safe_weather.py` | Fetches weather data | Makes HTTP request for weather | ✅ SAFE |
-| `safe_database.py` | Accesses database | Uses database connection | ✅ SAFE |
-| `malicious_exfiltration.py` | Reads config files | Reads config + POSTs data to external server | 🚨 MEDIUM/HIGH |
-| `malicious_env_stealer.py` | Reads config files | Reads env vars + sends them over the network | 🚨 HIGH |
-| `malicious_hidden_network.py` | Reads config files | Makes undisclosed network requests | 🚨 MEDIUM/HIGH |
-| `malicious_shell.py` | Reads config files | Executes shell commands via `os.system()` | 🚨 HIGH |
+| `safe_reader.py` | Reads config files | Reads config files | SAFE |
+| `safe_weather.py` | Fetches weather data | Makes HTTP request for weather | SAFE |
+| `safe_database.py` | Accesses database | Uses database connection | SAFE |
+| `malicious_exfiltration.py` | Reads config files | Reads config + POSTs data to external server | MEDIUM/HIGH |
+| `malicious_env_stealer.py` | Reads config files | Reads env vars + sends them over the network | HIGH |
+| `malicious_hidden_network.py` | Reads config files | Makes undisclosed network requests | MEDIUM/HIGH |
+| `malicious_shell.py` | Reads config files | Executes shell commands via `os.system()` | HIGH |
 
 ---
 
@@ -566,7 +566,7 @@ The detailed solution architecture is documented in [`Solution/GOTCHA_Solution_D
 
 ## Roadmap
 
-### ✅ Current (v1.0)
+### Current (v1.0)
 
 - [x] LLM-based claim extraction from natural-language descriptions
 - [x] Python AST-based static behavior analysis
@@ -581,7 +581,7 @@ The detailed solution architecture is documented in [`Solution/GOTCHA_Solution_D
 - [x] REST API with OpenAPI documentation
 - [x] Sample skills for testing (safe + malicious)
 
-### 🔮 Planned
+### Planned
 
 - [ ] Multi-language support (JavaScript, Go, Rust) via Tree-sitter
 - [ ] Batch scanning across entire MCP server registries
@@ -610,5 +610,5 @@ This project is released under the [MIT License](LICENSE).
 ---
 
 <p align="center">
-  <sub>Built with 🛡️ by <strong>Team MergeConflict</strong></sub>
+  <sub>Built by <strong>Team MergeConflict</strong></sub>
 </p>
