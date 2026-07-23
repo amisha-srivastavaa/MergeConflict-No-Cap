@@ -77,12 +77,11 @@ def fetch_repository_code(url: str):
 
                 if raw.status_code == 200:
 
-                    collected.append(
-                        f"\n\n===== {item['path']} =====\n"
-                    )
-
-                    collected.append(raw.text)
+                    collected.append({
+                    "path": item["path"],
+                    "code": raw.text
+                    })
 
     walk()
 
-    return "\n".join(collected)
+    return collected

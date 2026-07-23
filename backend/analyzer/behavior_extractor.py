@@ -116,18 +116,24 @@ class CapabilityVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
 
-def extract_behavior(code: str):
+def extract_behavior(files):
 
-    try:
+    capabilities = set()
 
-        tree = ast.parse(code)
+    for file in files:
 
-        visitor = CapabilityVisitor()
+        try:
 
-        visitor.visit(tree)
+            tree = ast.parse(file["code"])
 
-        return sorted(list(visitor.capabilities))
+            visitor = CapabilityVisitor()
 
-    except Exception:
+            visitor.visit(tree)
 
-        return ["Parse Error"]
+            capabilities.update(visitor.capabilities)
+
+        except Exception:
+            # Skip files that cannot be parsed
+            continue
+
+    return sorted(list(capabilities))

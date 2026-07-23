@@ -26,42 +26,59 @@ router = APIRouter()
 # ---------------------------------------------------
 # Existing Local Scan Endpoint
 # ---------------------------------------------------
-@router.post("/scan", response_model=ScanResponse)
-def scan(request: ScanRequest, db: Session = Depends(get_db)):
+@router.post("/scan/url", response_model=UrlScanResponse)
+def scan_url(
+    request: UrlScanRequest,
+    db: Session = Depends(get_db)
+):
 
-    claims = extract_claims(request.description)
+    try:
+        # Fetch repository contents
+        readme = fetch_readme(request.url)
+        code = fetch_repository_code(request.url)
 
-    behavior = extract_behavior(request.code)
+        # Run analysis
+        claims = extract_claims(readme)
+        behavior = extract_behavior(code)
 
-    hidden = compare_claims_behavior(
-        claims,
-        behavior
-    )
+        hidden = compare_claims_behavior(
+            claims,
+            behavior
+        )
 
-    risk, status, explanation = calculate_risk(hidden)
+        risk, status, explanation = calculate_risk(hidden)
 
-    result = ScanResult(
-        description=request.description,
-        claims=",".join(claims),
-        behavior=",".join(behavior),
-        hidden_behaviors=",".join(hidden),
-        risk_score=risk,
-        status=status,
-        explanation=explanation
-    )
+        # Save to database
+        result = ScanResult(
+            description=readme,
+            claims=",".join(claims),
+            behavior=",".join(behavior),
+            hidden_behaviors=",".join(hidden),
+            risk_score=risk,
+            status=status,
+            explanation=explanation
+        )
 
-    db.add(result)
-    db.commit()
-    db.refresh(result)
+        db.add(result)
+        db.commit()
+        db.refresh(result)
 
-    return ScanResponse(
-        risk=risk,
-        status=status,
-        claims=claims,
-        behavior=behavior,
-        hidden_behaviors=hidden,
-        explanation=explanation
-    )
+        # Return response expected by frontend
+        return UrlScanResponse(
+            id=result.id,
+            risk=risk,
+            status=status,
+            claims=claims,
+            behavior=behavior,
+            hidden_behaviors=hidden,
+            explanation=explanation
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 
 
 # ---------------------------------------------------
