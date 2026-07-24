@@ -1,0 +1,14 @@
+{
+  "title": "GOTCHA",
+  "description": "Analyze AI tools and repositories for trust verification, generating detailed Trust Reports with scores and behaviors to enhance cybersecurity decision-making.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  },
+  "icons": {
+    "icon": "/logo.png"
+  }
+}
