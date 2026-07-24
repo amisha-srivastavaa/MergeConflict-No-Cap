@@ -9,6 +9,10 @@
 </p>
 
 <p align="center">
+  <strong>GOTCHA</strong> is a semantic trust verification platform that audits AI tools, MCP servers, and agent skills by automatically comparing their documented claims against actual source code behavior to detect hidden risks.
+</p>
+
+<p align="center">
   <em>"Don't just scan the code. Verify the claim."</em>
 </p>
 
