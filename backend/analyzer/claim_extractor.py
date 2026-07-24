@@ -6,9 +6,11 @@ from openai import OpenAI
 
 load_dotenv()
 
-client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY")
-)
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+client = None
+if OPENAI_API_KEY:
+    client = OpenAI(api_key=OPENAI_API_KEY)
 
 MODEL = os.getenv(
     "MODEL_NAME",
@@ -45,7 +47,11 @@ def extract_claims(description: str):
 
     # Prevent sending extremely large READMEs
     description = description[:12000]
-
+    if client is None:
+        return [
+            "Repository functionality inferred from README.",
+            "LLM analysis unavailable (demo mode)."
+        ]
     try:
         response = client.chat.completions.create(
 
