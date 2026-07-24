@@ -1,6 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
-  ShieldCheck,
   LayoutDashboard,
   Search,
   FileText,
@@ -25,10 +24,9 @@ export function Sidebar() {
   return (
     <aside className="flex h-screen w-56 flex-col border-r border-zinc-200 bg-white">
       <div className="flex h-14 items-center gap-2.5 border-b border-zinc-200 px-4">
-        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-600">
-          <ShieldCheck className="h-4 w-4 text-white" strokeWidth={2.5} />
+        <div className="flex items-center gap-2">
+          <img src="/logo.png" alt="GOTCHA" className="h-10 w-auto object-contain" />
         </div>
-        <span className="text-sm font-bold tracking-tight text-zinc-900">GOTCHA</span>
         <span className="ml-auto rounded bg-indigo-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-indigo-600">
           Beta
         </span>

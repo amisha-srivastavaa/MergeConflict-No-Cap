@@ -64,10 +64,7 @@ export default function LandingPage() {
       <nav className="fixed top-0 z-50 w-full border-b border-zinc-200 bg-white/95 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
           <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-600">
-              <ShieldCheck className="h-4 w-4 text-white" strokeWidth={2.5} />
-            </div>
-            <span className="text-sm font-bold tracking-tight">GOTCHA</span>
+            <img src="/logo.png" alt="GOTCHA" className="h-10 w-auto object-contain" />
           </div>
           <div className="flex items-center gap-6">
             <a href="#features" className="text-sm text-zinc-500 hover:text-zinc-900 transition-colors">Features</a>
@@ -234,10 +231,7 @@ export default function LandingPage() {
       <footer className="border-t border-zinc-200 bg-zinc-50 py-8 px-6">
         <div className="mx-auto max-w-6xl flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-indigo-600">
-              <ShieldCheck className="h-3.5 w-3.5 text-white" strokeWidth={2.5} />
-            </div>
-            <span className="text-sm font-bold text-zinc-900">GOTCHA</span>
+            <img src="/logo.png" alt="GOTCHA" className="h-9 w-auto object-contain" />
           </div>
           <p className="text-xs text-zinc-400">
             &copy; 2024 GOTCHA. AI-powered semantic trust verification.
