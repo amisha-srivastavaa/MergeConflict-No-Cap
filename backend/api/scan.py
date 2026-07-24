@@ -81,9 +81,6 @@ def scan_url(
         )
 
     except Exception as e:
-        print("\n========== ERROR ==========")
-        traceback.print_exc()
-        print("===========================\n")
 
         raise HTTPException(
             status_code=500,
@@ -102,33 +99,23 @@ def scan_url(
 
     try:
 
-        print("Fetching repository...")
 
         readme = fetch_readme(request.url)
 
         files = fetch_repository_code(request.url)
 
-        print(f"README length: {len(readme)}")
-        print(f"Files downloaded: {len(files)}")
-
-        print("Extracting claims...")
 
         claims = extract_claims(readme)
 
-        print("Claims:", claims)
-
-        print("Extracting behavior...")
 
         behavior = extract_behavior(files)
 
-        print("Behavior:", behavior)
 
         hidden = compare_claims_behavior(
             claims,
             behavior
         )
 
-        print("Hidden:", hidden)
 
         risk, status, explanation = calculate_risk(hidden)
 

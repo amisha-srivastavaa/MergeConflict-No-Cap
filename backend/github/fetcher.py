@@ -19,7 +19,6 @@ HEADERS = {
 if GITHUB_TOKEN:
     HEADERS["Authorization"] = f"Bearer {GITHUB_TOKEN}"
 
-print("GitHub Token Loaded:", bool(GITHUB_TOKEN))
 
 SUPPORTED_EXTENSIONS = {
     ".py",
@@ -49,10 +48,6 @@ def fetch_readme(url: str):
     )
 
     if response.status_code != 200:
-        print("Status:", response.status_code)
-        print("Headers:", response.headers)
-        print("Body:")
-        print(response.text)
 
         raise Exception(
             f"Unable to fetch README. Status: {response.status_code}"
@@ -77,9 +72,7 @@ def fetch_repository_code(url: str):
         )
 
         if response.status_code != 200:
-            print("GitHub API Error:", response.status_code)
-            print(response.text)
-            return
+            raise Exception(f"GitHub API Error: {response.status_code}")
 
         items = response.json()
 
