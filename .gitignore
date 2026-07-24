@@ -1,7 +1,13 @@
+
 .env
+backend/.env
+
+.venv/
+venv/
+backend/venv/
+
 __pycache__/
 *.pyc
-.venv/
 .DS_Store
-venv/
+
 backend/database/scan_results.db
