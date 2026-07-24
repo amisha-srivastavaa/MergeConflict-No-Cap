@@ -40,6 +40,11 @@ def scan_url(
 
         # Run analysis
         claims = extract_claims(readme)
+        if not claims:
+            claims = [
+                "Functionality described in README (placeholder).",
+                "LLM claim extraction unavailable during demo."
+            ]
         behavior = extract_behavior(code)
 
         hidden = compare_claims_behavior(
