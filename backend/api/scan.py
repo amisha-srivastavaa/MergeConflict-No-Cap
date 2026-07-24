@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+import traceback
 
 from models.schemas import (
     ScanRequest,
@@ -75,6 +76,10 @@ def scan_url(
         )
 
     except Exception as e:
+        print("\n========== ERROR ==========")
+        traceback.print_exc()
+        print("===========================\n")
+
         raise HTTPException(
             status_code=500,
             detail=str(e)
@@ -90,30 +95,71 @@ def scan_url(
     db: Session = Depends(get_db)
 ):
 
-    result = ScanResult(
-        description=f"Repository: {request.url}",
-        claims="",
-        behavior="",
-        hidden_behaviors="",
-        risk_score=0,
-        status="PENDING",
-        explanation="Repository scan queued."
-    )
+    try:
 
-    db.add(result)
-    db.commit()
-    db.refresh(result)
+        print("Fetching repository...")
 
-    return UrlScanResponse(
-        scan_id=result.id,
-        status="PENDING",
-        message="Repository scan queued."
-    )
+        readme = fetch_readme(request.url)
 
+        files = fetch_repository_code(request.url)
 
+        print(f"README length: {len(readme)}")
+        print(f"Files downloaded: {len(files)}")
 
+        print("Extracting claims...")
 
+        claims = extract_claims(readme)
 
+        print("Claims:", claims)
+
+        print("Extracting behavior...")
+
+        behavior = extract_behavior(files)
+
+        print("Behavior:", behavior)
+
+        hidden = compare_claims_behavior(
+            claims,
+            behavior
+        )
+
+        print("Hidden:", hidden)
+
+        risk, status, explanation = calculate_risk(hidden)
+
+        result = ScanResult(
+            description=readme,
+            claims=",".join(claims),
+            behavior=",".join(behavior),
+            hidden_behaviors=",".join(hidden),
+            risk_score=risk,
+            status=status,
+            explanation=explanation
+        )
+
+        db.add(result)
+        db.commit()
+        db.refresh(result)
+
+        return UrlScanResponse(
+            id=result.id,
+            risk=result.risk_score,
+            status=result.status,
+            claims=claims,
+            behavior=behavior,
+            hidden_behaviors=hidden,
+            explanation=explanation,
+            message="Repository analyzed successfully."
+        )
+
+    except Exception as e:
+
+        print(e)
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 # ---------------------------------------------------
 # Scan History
 # ---------------------------------------------------

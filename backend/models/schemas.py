@@ -30,6 +30,15 @@ class UrlScanRequest(BaseModel):
 
 
 class UrlScanResponse(BaseModel):
-    scan_id: int
+    id: int
+
+    risk: int
     status: str
-    message: str
+
+    claims: List[str]
+    behavior: List[str]
+    hidden_behaviors: List[str]
+
+    explanation: str
+
+    message: Optional[str] = None
