@@ -18,6 +18,9 @@ HEADERS = {
 
 if GITHUB_TOKEN:
     HEADERS["Authorization"] = f"Bearer {GITHUB_TOKEN}"
+    
+print("GitHub token loaded:", bool(GITHUB_TOKEN))
+print("Token starts with:", GITHUB_TOKEN[:10] if GITHUB_TOKEN else None)
 
 
 SUPPORTED_EXTENSIONS = {
@@ -48,6 +51,8 @@ def fetch_readme(url: str):
     )
 
     if response.status_code != 200:
+        print("Status:", response.status_code)
+        print("Response:", response.text)
 
         raise Exception(
             f"Unable to fetch README. Status: {response.status_code}"
@@ -104,7 +109,7 @@ def fetch_repository_code(url: str):
                         }
                     )
                 else:
-                    print(f"Failed to download {item['path']}")
+                    print(f"Skipping {item['path']}")
 
     walk()
 

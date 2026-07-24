@@ -3,11 +3,10 @@ from sqlalchemy.orm import Session
 import traceback
 
 from models.schemas import (
-    ScanRequest,
-    ScanResponse,
     UrlScanRequest,
     UrlScanResponse,
 )
+
 from github.fetcher import (
     fetch_readme,
     fetch_repository_code,
@@ -25,71 +24,7 @@ router = APIRouter()
 
 
 # ---------------------------------------------------
-# Existing Local Scan Endpoint
-# ---------------------------------------------------
-@router.post("/scan/url", response_model=UrlScanResponse)
-def scan_url(
-    request: UrlScanRequest,
-    db: Session = Depends(get_db)
-):
-
-    try:
-        # Fetch repository contents
-        readme = fetch_readme(request.url)
-        code = fetch_repository_code(request.url)
-
-        # Run analysis
-        claims = extract_claims(readme)
-        if not claims:
-            claims = [
-                "Functionality described in README (placeholder).",
-                "LLM claim extraction unavailable during demo."
-            ]
-        behavior = extract_behavior(code)
-
-        hidden = compare_claims_behavior(
-            claims,
-            behavior
-        )
-
-        risk, status, explanation = calculate_risk(hidden)
-
-        # Save to database
-        result = ScanResult(
-            description=readme,
-            claims=",".join(claims),
-            behavior=",".join(behavior),
-            hidden_behaviors=",".join(hidden),
-            risk_score=risk,
-            status=status,
-            explanation=explanation
-        )
-
-        db.add(result)
-        db.commit()
-        db.refresh(result)
-
-        # Return response expected by frontend
-        return UrlScanResponse(
-            id=result.id,
-            risk=risk,
-            status=status,
-            claims=claims,
-            behavior=behavior,
-            hidden_behaviors=hidden,
-            explanation=explanation
-        )
-
-    except Exception as e:
-
-        raise HTTPException(
-            status_code=500,
-            detail=str(e)
-        )
-
-
-# ---------------------------------------------------
-# React Frontend Compatibility
+# Scan Repository
 # ---------------------------------------------------
 @router.post("/scan/url", response_model=UrlScanResponse)
 def scan_url(
@@ -99,27 +34,43 @@ def scan_url(
 
     try:
 
-
+        print("Fetching README...")
         readme = fetch_readme(request.url)
 
+        print("Fetching Repository...")
         files = fetch_repository_code(request.url)
 
-
+        print("Extracting Claims...")
         claims = extract_claims(readme)
 
+        if not claims:
+            claims = [
+                "Repository functionality inferred from README.",
+                "LLM claim extraction unavailable."
+            ]
 
+        print("Extracting Behavior...")
         behavior = extract_behavior(files)
 
-
+        print("Comparing Claims & Behavior...")
         hidden = compare_claims_behavior(
             claims,
             behavior
         )
 
-
+        print("Calculating Risk...")
         risk, status, explanation = calculate_risk(hidden)
 
+        print("Saving Scan...")
+        repo = request.url.rstrip("/").split("/")
+
+        owner = repo[-2]
+        name = repo[-1]
+
+        repo_name = f"{owner}/{name}"
         result = ScanResult(
+            url=request.url,
+            repo_name=repo_name,
             description=readme,
             claims=",".join(claims),
             behavior=",".join(behavior),
@@ -132,6 +83,8 @@ def scan_url(
         db.add(result)
         db.commit()
         db.refresh(result)
+
+        print("Scan Completed.")
 
         return UrlScanResponse(
             id=result.id,
@@ -144,14 +97,16 @@ def scan_url(
             message="Repository analyzed successfully."
         )
 
-    except Exception as e:
+    except Exception:
 
-        print(e)
+        traceback.print_exc()
 
         raise HTTPException(
             status_code=500,
-            detail=str(e)
+            detail="Repository analysis failed."
         )
+
+
 # ---------------------------------------------------
 # Scan History
 # ---------------------------------------------------
@@ -174,9 +129,9 @@ def get_history(
 
             "id": item.id,
 
-            "url": None,
+            "url": item.url,
 
-            "repo_name": None,
+            "repo_name": item.repo_name,
 
             "target_type": "github",
 
@@ -213,20 +168,9 @@ def analytics(
 
     total = len(scans)
 
-    safe = sum(
-        1 for s in scans
-        if s.status == "SAFE"
-    )
-
-    medium = sum(
-        1 for s in scans
-        if s.status == "MEDIUM"
-    )
-
-    high = sum(
-        1 for s in scans
-        if s.status == "HIGH"
-    )
+    safe = sum(1 for s in scans if s.status == "SAFE")
+    medium = sum(1 for s in scans if s.status == "MEDIUM")
+    high = sum(1 for s in scans if s.status == "HIGH")
 
     average = (
         sum(s.risk_score for s in scans) / total
@@ -240,6 +184,7 @@ def analytics(
         "highCount": high,
         "averageRiskScore": average
     }
+
 
 # ---------------------------------------------------
 # Get Single Scan
@@ -263,20 +208,29 @@ def get_scan(
         )
 
     return {
+
         "id": result.id,
-        "url": None,
-        "repo_name": None,
+
+        "url": result.url,
+
+        "repo_name": result.repo_name,
+
         "target_type": "github",
 
         "risk_score": result.risk_score,
+
         "risk_level": result.status,
+
         "status": result.status,
 
         "explanation": result.explanation,
 
         "claims": result.claims.split(",") if result.claims else [],
+
         "behavior": result.behavior.split(",") if result.behavior else [],
+
         "hidden_behaviors": result.hidden_behaviors.split(",") if result.hidden_behaviors else [],
 
         "created_at": result.created_at
+
     }

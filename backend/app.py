@@ -8,7 +8,7 @@ from database.database import Base, engine
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="SkillScope API",
+    title="GOTCHA API",
     version="1.0.0"
 )
 

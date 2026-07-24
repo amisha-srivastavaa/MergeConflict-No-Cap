@@ -9,7 +9,12 @@ from database.database import Base
 
 
 class ScanResult(Base):
+
     __tablename__ = "scan_results"
+
+    url = Column(String)
+    
+    repo_name = Column(String)
 
     id = Column(Integer, primary_key=True, index=True)
 

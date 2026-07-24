@@ -3,6 +3,7 @@ import os
 
 from dotenv import load_dotenv
 from openai import OpenAI
+import traceback
 
 load_dotenv()
 
@@ -78,6 +79,7 @@ def extract_claims(description: str):
 
         return data.get("claims", [])
 
-    except Exception as e:
-        print(f"Claim extraction failed: {e}")
+    except Exception:
+        traceback.print_exc()
+
         return []
