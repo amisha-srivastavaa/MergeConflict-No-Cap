@@ -1,4 +1,4 @@
-const API=`${import.meta.env.VITE_API_URL}/scan`;
+const API=`https://mergeconflict-gotcha.onrender.com/scan`;
 
 async function scanSkill() {
 
